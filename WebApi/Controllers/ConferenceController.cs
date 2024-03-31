@@ -87,7 +87,7 @@ namespace WebApi.Controllers
             return NoContent();
         }
 
-        [HttpGet("/applications/submittedDate=")]
+        [HttpGet("/applications")]
         public ActionResult<IEnumerable<Conference>> GetSubmittedConference([FromQuery] DateTime? afterDate, bool isSubmitted)
         {
             var query = _dbContext.Conference.AsEnumerable();
