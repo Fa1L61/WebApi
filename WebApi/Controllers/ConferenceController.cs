@@ -8,10 +8,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using System.Reflection;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using WebApi.Models;
-<<<<<<< HEAD
 using WebApi.Context;
-=======
->>>>>>> 290151b5fb86384471fe74dc99e9fa52c254628d
 
 namespace WebApi.Controllers
 {
@@ -29,10 +26,7 @@ namespace WebApi.Controllers
             var submittedConf = GetCurrentConferenceByUser(conference.AuthorId);
             if (submittedConf.Value == null && conference.AuthorId != default && checker) 
             {
-                if (conference.IsSubmitted == true)
-                {
-                    conference.SubmittedDate = conference.CreatedDate;
-                }
+                conference.SubmittedDate = default;
                 _dbContext.Conference.Add(conference);
                 _dbContext.SaveChanges();
                 return conference;
@@ -94,30 +88,21 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("/applications/submittedDate=")]
-        public ActionResult<IEnumerable<Conference>> GetSubmittedConference([FromQuery] DateTime? afterDate)
+        public ActionResult<IEnumerable<Conference>> GetSubmittedConference([FromQuery] DateTime? afterDate, bool isSubmitted)
         {
             var query = _dbContext.Conference.AsEnumerable();
 
-
-            if (afterDate.HasValue)
+            if (afterDate.HasValue && !isSubmitted)
+            {
+                query = _dbContext.Conference.Where(a => !a.IsSubmitted && (a.CreatedDate > afterDate));
+            }
+            else if (afterDate.HasValue && isSubmitted)
             {
                 query = _dbContext.Conference.Where(a => a.SubmittedDate > afterDate);
             }
             return query.ToList();
         }
-        [HttpGet("/applications/unsubmittedDate=")]
-        public ActionResult<IEnumerable<Conference>> GetUnsubmittedConference([FromQuery] DateTime? afterDate)
-        {
-            var query = _dbContext.Conference.AsEnumerable();
-
-            if (afterDate.HasValue)
-            {
-               query = _dbContext.Conference.Where(a => !a.IsSubmitted && (a.CreatedDate > afterDate));
-            }
-
-            return query.ToList();
-        }
-
+        
         [HttpGet("{authorId}/current")]
         public ActionResult<Conference> GetCurrentConferenceByUser(Guid authorId)
         {
@@ -143,7 +128,6 @@ namespace WebApi.Controllers
         {            
             var query = _dbContext.Activity.ToList();
 
-            
             return query;
         }
 
