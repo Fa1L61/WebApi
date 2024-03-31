@@ -123,7 +123,7 @@ namespace WebApi.Controllers
             return conference;
         }
 
-        [HttpGet("types")]
+        [HttpGet("activities")]
         public ActionResult<IEnumerable<Activity>> GetActivityTypes()
         {            
             var query = _dbContext.Activity.ToList();
